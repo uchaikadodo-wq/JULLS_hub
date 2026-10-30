@@ -15,6 +15,7 @@ import secrets
 import shutil
 import subprocess
 import tarfile
+import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
 ACCESS = ROOT.parent / '.server-access'
@@ -26,14 +27,24 @@ REMOTE = '/opt/lookin-base'
 APP_IMAGE = 'lookin-base-app:v26.09.2-20261030-1'
 WEB_IMAGE = 'lookin-base-web:v26.09.2-20261030-1'
 
-def remote(command, data=None, binary=False, capture=False):
-    # Reuse the pinned key/host identity, never disable host checking.
-    args = ['ssh', '-T', '-i', str(VPS.KEY), '-o', 'IdentitiesOnly=yes', '-o', 'IdentityAgent=none',
+def ssh_args(command):
+    control_file = PRIVATE / 'ssh-control-path'
+    if control_file.exists():
+        control = control_file.read_text().strip()
+    else:
+        directory = tempfile.mkdtemp(prefix='lookin-vps-', dir='/private/tmp')
+        control = str(Path(directory) / 'control')
+        control_file.write_text(control)
+    # Reuse one authenticated connection, preserving the SSH rate limit.
+    return ['ssh', '-T', '-i', str(VPS.KEY), '-o', 'IdentitiesOnly=yes', '-o', 'IdentityAgent=none',
         '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes',
         '-o', 'UserKnownHostsFile="' + str(ACCESS / 'known_hosts') + '"',
         '-o', 'HostKeyAlgorithms=ssh-ed25519', '-o', 'ConnectTimeout=10',
-        '-o', 'ServerAliveInterval=20', 'ltadmin@' + VPS.HOST, command]
-    return subprocess.run(args, input=data, text=not binary, check=True, capture_output=capture)
+        '-o', 'ServerAliveInterval=20', '-o', 'ControlMaster=auto', '-o', 'ControlPersist=300s',
+        '-o', 'ControlPath=' + control, 'ltadmin@' + VPS.HOST, command]
+
+def remote(command, data=None, binary=False, capture=False):
+    return subprocess.run(ssh_args(command), input=data, text=not binary, check=True, capture_output=capture)
 
 def cp_command(operation):
     return 'sudo -n docker compose --env-file /opt/lookin-base/deploy.env -f /opt/lookin-base/server/compose.yaml ' + operation
@@ -120,14 +131,19 @@ def upload():
     for path in [images, package]:
         # Stream from protected files without loading the image archive into memory.
         command = 'umask 077; cat > /opt/lookin-base/incoming/' + path.name
-        args = ['ssh', '-T', '-i', str(VPS.KEY), '-o', 'IdentitiesOnly=yes', '-o', 'IdentityAgent=none', '-o', 'BatchMode=yes',
-            '-o', 'StrictHostKeyChecking=yes', '-o', 'UserKnownHostsFile="' + str(ACCESS / 'known_hosts') + '"',
-            '-o', 'HostKeyAlgorithms=ssh-ed25519', '-o', 'ServerAliveInterval=20', 'ltadmin@' + VPS.HOST, command]
         with path.open('rb') as stream:
-            subprocess.run(args, stdin=stream, check=True)
+            subprocess.run(ssh_args(command), stdin=stream, check=True)
         remote('test "$(sha256sum /opt/lookin-base/incoming/' + path.name + ' | cut -d\" \" -f1)" = ' + hashes[path.name])
-    remote('umask 077; tar -xzf /opt/lookin-base/incoming/deployment.tar.gz -C /opt/lookin-base; chmod 700 /opt/lookin-base/secrets; chmod 600 /opt/lookin-base/deploy.env /opt/lookin-base/secrets/*; printf %s ' + revision + ' > /opt/lookin-base/release-git-commit')
+    unpack()
     print('Archives transferred and checksums verified; website not started.')
+
+def unpack():
+    state=json.loads((PRIVATE/'state.json').read_text())
+    hashes=json.loads((PRIVATE/'transfer-sha256.json').read_text())
+    for name,digest in hashes.items():
+        remote('test "$(sha256sum /opt/lookin-base/incoming/' + name + ' | cut -d\" \" -f1)" = ' + digest)
+    remote('set -eu; test ! -e /opt/lookin-base/deploy.env; umask 077; tar -xzf /opt/lookin-base/incoming/deployment.tar.gz -C /opt/lookin-base; chmod 700 /opt/lookin-base/secrets; chmod 600 /opt/lookin-base/deploy.env /opt/lookin-base/secrets/*; printf %s ' + state['release_git_commit'] + ' > /opt/lookin-base/release-git-commit')
+    print('Verified deployment package unpacked.')
 
 def load():
     remote('sudo -n docker load -i /opt/lookin-base/incoming/images.tar.gz')
@@ -190,7 +206,7 @@ def publish():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase', choices=['prepare', 'upload', 'load', 'restore', 'configure', 'publish'])
+    parser.add_argument('phase', choices=['prepare', 'upload', 'unpack', 'load', 'restore', 'configure', 'publish'])
     parser.add_argument('--acme-email')
     args = parser.parse_args()
     if args.phase == 'prepare':

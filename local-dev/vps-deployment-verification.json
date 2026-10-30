@@ -1,0 +1,123 @@
+{
+  "date": "2026-10-30",
+  "url": "https://base.lookin.team",
+  "result": "PASS",
+  "tls_verified": true,
+  "certificate_expires": "Jan 28 10:44:46 2027 GMT",
+  "http_redirects_to_https": true,
+  "admin_login_and_secure_cookie": "PASS",
+  "homepage_profile_search_fonts": "PASS",
+  "api_reader_can_read": "PASS",
+  "api_administration_denied": "PASS",
+  "temporary_validation_token_revoked": true,
+  "published_books": 1,
+  "published_pages": 2,
+  "private_ports": {
+    "3306": "not reachable from this Mac",
+    "8080": "not reachable from this Mac",
+    "9000": "not reachable from this Mac",
+    "2019": "not reachable from this Mac"
+  },
+  "checks": [
+    {
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "path": "/books",
+      "status": 200
+    },
+    {
+      "path": "/api/books",
+      "status": 401
+    },
+    {
+      "path": "/.env",
+      "status": 404
+    },
+    {
+      "path": "/uploads/test.php",
+      "status": 404
+    },
+    {
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "path": "/books",
+      "status": 200
+    },
+    {
+      "path": "/user/local-administrator",
+      "status": 200
+    },
+    {
+      "path": "/search?term=%D0%94%D0%BE%D0%B4%D0%BE",
+      "status": 200
+    },
+    {
+      "path": "/licenses",
+      "status": 200
+    },
+    {
+      "path": "/theme/lookin-base/lookin.css",
+      "status": 200
+    },
+    {
+      "path": "/theme/lookin-base/fonts/Prata-Regular.ttf",
+      "status": 200
+    },
+    {
+      "path": "/api/books",
+      "status": 200
+    },
+    {
+      "path": "/api/pages",
+      "status": 200
+    },
+    {
+      "path": "/api/pages/2",
+      "status": 200
+    },
+    {
+      "path": "/api/pages/3",
+      "status": 200
+    },
+    {
+      "path": "/api/users",
+      "status": 403
+    },
+    {
+      "path": "/api/roles",
+      "status": 403
+    },
+    {
+      "path": "/api/books",
+      "status": 401
+    }
+  ],
+  "content_and_credentials_not_recorded": true,
+  "live_write_tests": "not performed on real articles; tested on isolated release copy",
+  "source_git_commit": "7ddbda4c0f58502b257100afc493424db87cfca8",
+  "restored_tables_matched": 41,
+  "app_key_preserved": true,
+  "admin_password_rotated": true,
+  "local_pilot_tokens_revoked": true,
+  "server_initial_backup": "/opt/lookin-base/backups/initial-20261030/",
+  "working_copy": "VPS is primary; local copy retained for development/rollback",
+  "regular_offsite_backups": false,
+  "outbound_mail_configured": false,
+  "remote_mcp_deployed": false,
+  "resource_sample_mib": {
+    "app": 87.86,
+    "mysql": 160.4,
+    "caddy": 66.05
+  },
+  "free_disk_approx_gb": 41,
+  "old_local_urls_updated": 0,
+  "browser_homepage_verified": true
+}
