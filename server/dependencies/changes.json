@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-30",
+  "upstream_commit": "6265d5667dd6904b7aa0d05a8c60795cf104011b",
+  "original_files_unchanged": true,
+  "changes": [
+    {
+      "ecosystem": "npm",
+      "package": "node_modules/handlebars",
+      "before": "4.7.9",
+      "after": "4.7.10"
+    },
+    {
+      "ecosystem": "npm",
+      "package": "node_modules/markdown-it",
+      "before": "14.3.2",
+      "after": "14.3.3"
+    },
+    {
+      "ecosystem": "npm",
+      "package": "node_modules/shell-quote",
+      "before": "1.10.0",
+      "after": "1.12.0"
+    },
+    {
+      "ecosystem": "npm",
+      "package": "node_modules/source-map-js",
+      "before": "1.2.1",
+      "after": "1.2.2"
+    },
+    {
+      "ecosystem": "composer",
+      "package": "symfony/mime",
+      "before": "v7.4.19",
+      "after": "v7.4.22"
+    }
+  ],
+  "sha256": {
+    "composer.lock": "10fe990ce00f241af49f1f9099b9c9b01a29fce9789d7634445c8f7f18bbc8b5",
+    "package-lock.json": "76b97639e753dfc4eb34ae995dae605080961ab88e4abb3cd199616bafbbadae"
+  }
+}

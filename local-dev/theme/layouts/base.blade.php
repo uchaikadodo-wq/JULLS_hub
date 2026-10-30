@@ -1,0 +1,102 @@
+@php
+    $lookinHome = isset($homeView) && $homeView === 'default';
+    $lookinShell = !user()->isGuest() && !$lookinHome;
+@endphp
+<!DOCTYPE html>
+<html lang="{{ isset($locale) ? $locale->htmlLang() : config('app.default_locale') }}"
+      dir="{{ isset($locale) ? $locale->htmlDirection() : 'auto' }}"
+      class="{{ setting()->getForCurrentUser('dark-mode-enabled') ? 'dark-mode ' : '' }}">
+<head>
+    <title>{{ isset($pageTitle) ? $pageTitle . ' | ' : '' }}{{ setting('app-name') }}</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="token" content="{{ csrf_token() }}">
+    <meta name="base-url" content="{{ url('/') }}">
+    <meta name="theme-color" content="{{(setting()->getForCurrentUser('dark-mode-enabled') ? setting('app-color-dark') : setting('app-color'))}}"/>
+
+    <!-- Social Cards Meta -->
+    <meta property="og:title" content="{{ isset($pageTitle) ? $pageTitle . ' | ' : '' }}{{ setting('app-name') }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @stack('social-meta')
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ versioned_asset('dist/styles.css') }}">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="256x256" href="{{ setting('app-icon') ?: url('/icon.png') }}">
+    <link rel="icon" type="image/png" sizes="180x180" href="{{ setting('app-icon-180') ?: url('/icon-180.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ setting('app-icon-180') ?: url('/icon-180.png') }}">
+    <link rel="icon" type="image/png" sizes="128x128" href="{{ setting('app-icon-128') ?: url('/icon-128.png') }}">
+    <link rel="icon" type="image/png" sizes="64x64" href="{{ setting('app-icon-64') ?: url('/icon-64.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ setting('app-icon-32') ?: url('/icon-32.png') }}">
+
+    <!-- PWA -->
+    <link rel="manifest" href="{{ url('/manifest.json') }}" crossorigin="use-credentials">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- OpenSearch -->
+    <link rel="search" type="application/opensearchdescription+xml" title="{{ setting('app-name') }}" href="{{ url('/opensearch.xml') }}">
+
+    <!-- Custom Styles & Head Content -->
+    @include('layouts.parts.custom-styles')
+    @include('layouts.parts.custom-head')
+
+    @if($lookinShell)
+        <link rel="stylesheet" href="{{ url('/theme/lookin-base/lookin.css') }}?v=3">
+        <link rel="stylesheet" href="{{ url('/theme/lookin-base/interior.css') }}?v=8">
+    @endif
+    @stack('head')
+
+    <!-- Translations for JS -->
+    @stack('translations')
+</head>
+<body
+    @if(setting()->getForCurrentUser('ui-shortcuts-enabled', false))
+        component="shortcuts"
+        option:shortcuts:key-map="{{ \BookStack\Settings\UserShortcutMap::fromUserPreferences()->toJson() }}"
+    @endif
+      class="@stack('body-class'){{ $lookinShell ? ' lookin-app' : '' }}">
+
+    @include('layouts.parts.base-body-start')
+    @include('layouts.parts.skip-to-content')
+    @include('layouts.parts.notifications')
+    @if($lookinShell)
+        <div class="lk-shell lk-app-shell">
+            @include('lookin.sidebar')
+            <div class="lk-page-column">
+                <div class="lk-topbar print-hidden" role="banner">
+                    <a class="lk-topbar-home" href="{{ url('/') }}">Lookin.Team Base</a>
+                    <div class="lk-topbar-search">
+                        @if(user()->hasAppAccess())
+                            @include('layouts.parts.header-search')
+                        @endif
+                    </div>
+                    <div class="lk-topbar-account">
+                        @include('layouts.parts.header-user-menu', ['user' => user()])
+                    </div>
+                </div>
+    @else
+        @include('layouts.parts.header')
+    @endif
+
+    <div id="content" components="@yield('content-components')" class="block{{ $lookinShell ? ' lk-page-content' : '' }}">
+        @yield('content')
+    </div>
+
+    @include('layouts.parts.footer')
+    @include('layouts.parts.back-to-top')
+    @if($lookinShell)
+            </div>
+        </div>
+    @endif
+
+    @if($cspNonce ?? false)
+        <script src="{{ versioned_asset('dist/app.js') }}" type="module" nonce="{{ $cspNonce }}"></script>
+    @endif
+    @stack('body-end')
+
+    @include('layouts.parts.base-body-end')
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "lookin-base-reader": {
+      "command": "/ABSOLUTE/PATH/TO/python3",
+      "args": ["/ABSOLUTE/PATH/TO/bookstack-local/mcp/server.py"],
+      "env": {
+        "BOOKSTACK_CREDENTIALS_FILE": "/PRIVATE/PATH/TO/this-agent.json"
+      }
+    }
+  }
+}

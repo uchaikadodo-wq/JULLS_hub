@@ -1,0 +1,112 @@
+name: bookstack-local
+x-php: &php
+  image: bookstack-local-php:dev
+  build:
+    context: .
+    dockerfile: local-dev/Dockerfile
+  working_dir: /app
+  user: "1000:1000"
+  env_file: .env
+  environment:
+    COMPOSER_HOME: /tmp/composer
+  volumes:
+    - type: bind
+      source: .
+      target: /app
+    - type: bind
+      source: ./local-dev/theme
+      target: /app/themes/lookin-base
+      read_only: true
+    - type: bind
+      source: ./local-dev/php-overrides.ini
+      target: /usr/local/etc/php/conf.d/zz-lookin.ini
+      read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  init: true
+  pids_limit: 256
+  mem_limit: 2g
+  networks: [isolated]
+services:
+  db:
+    image: mysql:8.4@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69
+    environment:
+      MYSQL_DATABASE: bookstack-dev
+      MYSQL_USER: bookstack-local
+      MYSQL_PASSWORD: synthetic-local-only
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    volumes:
+      - db:/var/lib/mysql
+      - ./local-dev/init.sql:/docker-entrypoint-initdb.d/01-local.sql:ro
+    networks: [isolated]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u "$$MYSQL_USER" "$$MYSQL_DATABASE" -e "SELECT 1" >/dev/null']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    mem_limit: 1g
+  app:
+    <<: *php
+    command: [php, artisan, serve, --host=0.0.0.0, --port=8080, --no-reload]
+    depends_on:
+      db:
+        condition: service_healthy
+  web:
+    image: node:24-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+    user: "1000:1000"
+    command: [node, /local-proxy.mjs]
+    volumes:
+      - ./local-dev/local-proxy.mjs:/local-proxy.mjs:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+    networks: [ingress, isolated]
+    depends_on: [app]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    init: true
+    pids_limit: 64
+    mem_limit: 128m
+  php-deps:
+    <<: *php
+    profiles: [setup]
+    networks: [download]
+    command: [composer, install, --no-plugins, --no-scripts, --prefer-dist, --no-interaction]
+  node:
+    image: node:24-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+    profiles: [tools]
+    user: "1000:1000"
+    working_dir: /app
+    environment:
+      npm_config_cache: /tmp/npm-cache
+      npm_config_update_notifier: "false"
+    volumes:
+      - .:/app
+    networks: [isolated]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    init: true
+    mem_limit: 2g
+    command: [npm, run, build]
+  node-deps:
+    image: node:24-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+    profiles: [setup]
+    user: "1000:1000"
+    working_dir: /app
+    environment:
+      npm_config_cache: /tmp/npm-cache
+      npm_config_update_notifier: "false"
+    volumes:
+      - .:/app
+    networks: [download]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    command: [npm, ci, --ignore-scripts, --no-audit, --no-fund]
+volumes:
+  db: {}
+networks:
+  isolated:
+    internal: true
+  ingress: {}
+  download: {}

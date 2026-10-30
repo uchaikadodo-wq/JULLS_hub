@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-30",
+  "bookstack_base": "6265d5667dd6904b7aa0d05a8c60795cf104011b",
+  "architecture": "linux/amd64",
+  "domain": "base.lookin.team",
+  "images": {
+    "app": "sha256:5706731f1da75824474074b46ee609a70371fd00d1849f7303401c2c2fc58eca",
+    "web": "sha256:121916f054970fa0b7a30d35dceed0338d5019746f7bc1359a3f17f04d545837"
+  },
+  "sha256": {
+    "server/Caddyfile": "61fbe81199e54f400b25a447b9cba7554cdb8b2dfe0fe181cdc3ac943e860488",
+    "server/Dockerfile": "cdbb222b52e29ca470421c0279cbe36bd76e020c9bf4a3b6fcacc9453d4aa149",
+    "server/Dockerfile.dockerignore": "a2fd3f0d2452304e01dfc4415cc234e0244cbc6f1718ef44ddc07f21fa43a739",
+    "server/README.ru.md": "058e0e2ab220227e38a27ea01732417fa0244baed0e5ee398ab44e24f9a5c338",
+    "server/app.env.example": "15175b76a60b3114f8e864e5af41cd2a8e6c860ddfdbaf10a72576a546d194a3",
+    "server/compose.yaml": "0d759c45c5050ab099d67a2862e722283b20e5c4460565cfece9abb0fdd429e2",
+    "server/dependencies/SECURITY.ru.md": "fb70e4bd4b48e9bf2c7499211429d5d12e5a3d92af75cf414dc15b46cfc59770",
+    "server/dependencies/changes.json": "579bcc8d20c3f6c00168a33ebaf5bd6a5aeee8978a2de3d40eb286e41736eaa5",
+    "server/dependencies/composer-audit.json": "3d68c4566587606c21e4bcd82b55d322ddb79158f657d9fb90bf0d24ab5bccdf",
+    "server/dependencies/composer.lock": "10fe990ce00f241af49f1f9099b9c9b01a29fce9789d7634445c8f7f18bbc8b5",
+    "server/dependencies/npm-audit-build.json": "a17f0a3589044713604da721b5873f35a6536b04c02fca02caaa6d0c0b535302",
+    "server/dependencies/npm-audit-runtime.json": "5eb03690ef8ffa3e49d8d60163ea5b3a230239fd2f139bb26506e4a2751946cc",
+    "server/dependencies/package-lock.json": "76b97639e753dfc4eb34ae995dae605080961ab88e4abb3cd199616bafbbadae",
+    "server/deploy.env.example": "bda48ae5a9680c671d295743fe8596b2f0b38b12c7f87fad6f7e8bf3a50d330b",
+    "server/php-fpm.conf": "fd42eaedeaeddf4822d4e1e785c928ded4652b0c4e1cac3f10326dfd18a358a4",
+    "server/php.ini": "1634805a9898b9b28b14011593def2fcc68337662fb45207348bb7dacee43c94",
+    "server/release-check.php": "aebb69eace58b4bdb222a001c82e9d84a62f1239234f3687d014143e6a6f9c0b",
+    "server/tests/fixtures.php": "995a9dcf6a68e019253f4c4bcdab9755728428536e6f5ca463935f090410d6db"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-30",
+  "project": "lookin-release-check-20261030t095803z",
+  "production_static_checks": "PASS",
+  "architecture_tested": "linux/amd64 under Docker Desktop emulation",
+  "vps_untouched": true,
+  "result": "PASS",
+  "migrations": "PASS",
+  "php_fpm_caddy_http": "PASS",
+  "private_access": "PASS",
+  "login_theme_search": "PASS",
+  "api_reader_no_write": "PASS",
+  "original_attachment_download": "PASS",
+  "article_exports": "PASS",
+  "persistence_after_app_replacement": "PASS",
+  "mime_header_protection": "PASS",
+  "no_credentials_in_images": "PASS",
+  "local_web_port": "127.0.0.1:8082 only",
+  "caddy_https_configuration": "PASS (offline validation only; certificate not issued)",
+  "php_tests": {
+    "tests": 1630,
+    "assertions": 8052,
+    "skipped": 4,
+    "result": "PASS"
+  },
+  "javascript_tests": {
+    "suites_passed": 50,
+    "tests_passed": 902,
+    "tests_skipped": 1,
+    "result": "PASS"
+  },
+  "dependency_audits": {
+    "composer_advisories": 0,
+    "npm_runtime_advisories": 0,
+    "npm_build_low_warnings_remaining": 6,
+    "remaining_cause": "unpatched deepmerge in Jest toolchain; absent from final runtime images"
+  },
+  "image_ids": {
+    "app": "sha256:5706731f1da75824474074b46ee609a70371fd00d1849f7303401c2c2fc58eca",
+    "web": "sha256:121916f054970fa0b7a30d35dceed0338d5019746f7bc1359a3f17f04d545837"
+  },
+  "upstream_tracked_files_modified": false,
+  "known_limits": [
+    "amd64 tested under emulation, not on physical VPS",
+    "TLS certificate issuance not tested",
+    "load on 2 GB VPS not tested",
+    "SMTP not configured",
+    "remote authenticated MCP not deployed",
+    "offsite scheduled backups not configured",
+    "full OS-image CVE scan not performed",
+    "working local dependencies were not updated"
+  ]
+}

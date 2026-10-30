@@ -1,0 +1,4 @@
+# The image only needs local-dev/Dockerfile; source is mounted at runtime.
+**
+!local-dev/
+!local-dev/Dockerfile

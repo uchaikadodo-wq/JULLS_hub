@@ -1,0 +1,30 @@
+{
+    admin off
+    email {$ACME_EMAIL}
+    servers {
+        protocols h1 h2
+    }
+}
+
+{$SITE_ADDRESS:base.lookin.team} {
+    root * /srv/public
+    encode zstd gzip
+    request_body {
+        max_size 55MB
+    }
+    header {
+        -Server
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+    route {
+        # Only the internal front-controller rewrite may reach a PHP file.
+        @blocked path_regexp blocked `(?i)(^|/)\.|\.(php|phtml|phar)(/|$)`
+        respond @blocked 404
+        php_fastcgi app:9000 {
+            root /app/public
+            read_timeout 120s
+        }
+        file_server
+    }
+}
