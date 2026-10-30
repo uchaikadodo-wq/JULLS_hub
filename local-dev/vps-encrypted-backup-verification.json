@@ -1,0 +1,11 @@
+{
+  "decryption": "PASS",
+  "archive_checksums": "PASS",
+  "uploads_archive_safety": "PASS",
+  "app_key_present": "PASS",
+  "mysql_restore_and_all_table_counts": "PASS",
+  "tables": 41,
+  "production_database_modified": false,
+  "offsite_roundtrip_tested": false,
+  "full_application_restore_tested": false
+}
